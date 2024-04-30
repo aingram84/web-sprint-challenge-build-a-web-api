@@ -18,4 +18,25 @@ async function checkProjectId(req, res, next) {
     }
 }
 
-module.exports = {checkProjectId};
+async function checkProjectCreatePayload(req, res, next) {
+    if (req.body.name && req.body.description) {
+      next()
+    } else {
+      next({
+        status: 400,
+        message: 'Please provide name and description for the project',
+      });
+    }
+  }
+  
+  async function checkProjectUpdatePayload(req, res, next) {
+    if (req.body.name && req.body.description && req.body.completed !== undefined) {
+      next()
+    } else {
+      next({
+        status: 400,
+        message: 'Please provide name, description and completed status',
+      });
+    }
+  }
+module.exports = {checkProjectId, checkProjectCreatePayload, checkProjectUpdatePayload}

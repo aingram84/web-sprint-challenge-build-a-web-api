@@ -1,6 +1,7 @@
 // Write your "actions" router here!
 const express = require('express');
 const expressRouter = express.Router();
+const middleware = require('./actions-middlware')
 
 const Action = require('./actions-model');
 
@@ -18,7 +19,7 @@ expressRouter.get('/', (req, res) => {
         )
 })
 
-expressRouter.get('/:id', (req, res) => {
+expressRouter.get('/:id', middleware.checkActionsId, (req, res) => {
     Action.get(req.params.id)
         .then(action => {
             res.json(action)
@@ -48,28 +49,16 @@ expressRouter.post('/', (req, res) => {
         })
 })
 
-expressRouter.put('/:id', (req, res) => {
-    const action = req.body;
-    if (!action.id || !action.project_id || !action.description || !action.notes || !action.completed ) {
-        res.status(400).json({
-            message: "Please provide missing field"
-        })
-    } else {
-        Action.insert(action)
-            .then(createdAction => {
-                res.status(201).json(createdAction)
-            })
-            .catch(err => {
-                res.status(404).json({
-                    message: 'No action with selected ID',
-                    err: err.message,
-                    stack: err.stack,
-                })
-            })
+expressRouter.put('/:id', middleware.checkActionUpdatePayload, middleware.checkActionsId, async (req, res, next) => {
+    try {
+      const updated = await Action.update(req.params.id, req.body);
+      res.status(200).json(updated);
+    } catch (error) {
+      next({ message: 'We ran into an error updating the project' });
     }
-})
+  });
 
-expressRouter.delete('/:id', (req, res) => {
+expressRouter.delete('/:id', middleware.checkActionsId, (req, res) => {
     Action.remove(req.params.id)
         .then(() => {
             res.status(200).json()
