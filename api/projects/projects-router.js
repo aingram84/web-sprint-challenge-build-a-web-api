@@ -1,7 +1,7 @@
 // Write your "projects" router here!
 const express = require('express');
 const expressRouter = express.Router();
-
+const middleware = require('./projects-middleware')
 const Project = require('./projects-model');
 
 expressRouter.get('/', (req, res) => {
@@ -18,7 +18,7 @@ expressRouter.get('/', (req, res) => {
         )
 })
 
-expressRouter.get('/:id', (req, res) => {
+expressRouter.get('/:id', middleware.checkProjectId, (req, res) => {
     Project.get(req.params.id)
         .then(project => {
             res.json(project)

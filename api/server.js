@@ -15,11 +15,11 @@ server.use('/', (req, res) => {
     })
 })
 
-// server.use((req, res, err, next) => {
-//     res.status(500).json({
-//         message: `${err.message}`
-//     })
-// })
+server.use((err, req, res, next) => {
+    res.status(err.status || 500).json({
+        message: `${err.message}`
+    })
+})
 
 // Configure your server here
 // Build your actions router in /api/actions/actions-router.js
